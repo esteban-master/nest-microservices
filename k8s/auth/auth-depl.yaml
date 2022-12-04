@@ -17,13 +17,11 @@ spec:
         image: nestjs/auth
         ports: 
         - containerPort: 3000
-        env:
-          - name: MONGO_URI
-            valueFrom:
-              configMapKeyRef:
-                name: auth-config-map
-                key: MONGO_URI
-              
+        envFrom:
+          - configMapRef:
+              name: auth-config-map
+          - secretRef:
+              name: auth-secret
 ---
 apiVersion: v1
 kind: Service

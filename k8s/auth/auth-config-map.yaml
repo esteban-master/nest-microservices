@@ -4,3 +4,4 @@ metadata:
   name: auth-config-map
 data: 
   MONGO_URI: mongodb://auth-mongo-srv:27017/auth
+  JWT_EXPIRE: 1d

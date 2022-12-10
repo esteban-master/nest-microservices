@@ -1,37 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-depl
+  name: orders-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth
+      app: orders
   template: 
     metadata:
       labels:
-        app: auth
+        app: orders
     spec:
       containers:
-      - name: auth
-        image: nestjs/auth
+      - name: orders
+        image: nestjs/orders
         ports: 
         - containerPort: 3000
         envFrom:
           - configMapRef:
-              name: auth-config-map
+              name: orders-config-map
           - secretRef:
               name: jwt-secret
 ---
 apiVersion: v1
 kind: Service
 metadata: 
-  name: auth-srv
+  name: orders-srv
 spec: 
   selector: 
-    app: auth
+    app: orders
   ports:
-  - name: auth
+  - name: orders
     protocol: TCP
     port: 3000
     targetPort: 3000

@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { CreateTicketDto } from './dto/createTicketDto';
 
 @Injectable()
 export class TicketsService {
-  getHello(): string {
-    return 'Hello World tickets!';
+  async create(createTicketDto: CreateTicketDto) {
+    return createTicketDto;
   }
 }

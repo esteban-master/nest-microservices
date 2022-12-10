@@ -18,7 +18,7 @@ import { LocalStrategy } from './local.strategy';
       isGlobal: true,
       validationSchema: Joi.object({
         MONGO_URI: Joi.string().required(),
-        JWT_KEY: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
       }),
     }),
     DatabaseModule,
@@ -44,7 +44,7 @@ import { LocalStrategy } from './local.strategy';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET'),
         signOptions: {
-          expiresIn: configService.get('JWT_EXPIRE'),
+          expiresIn: '1d',
         },
       }),
       inject: [ConfigService],

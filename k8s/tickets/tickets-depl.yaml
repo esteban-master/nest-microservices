@@ -1,37 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-depl
+  name: tickets-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth
+      app: tickets
   template: 
     metadata:
       labels:
-        app: auth
+        app: tickets
     spec:
       containers:
-      - name: auth
-        image: nestjs/auth
+      - name: tickets
+        image: nestjs/tickets
         ports: 
         - containerPort: 3000
         envFrom:
           - configMapRef:
-              name: auth-config-map
+              name: tickets-config-map
           - secretRef:
               name: jwt-secret
 ---
 apiVersion: v1
 kind: Service
 metadata: 
-  name: auth-srv
+  name: tickets-srv
 spec: 
   selector: 
-    app: auth
+    app: tickets
   ports:
-  - name: auth
+  - name: tickets
     protocol: TCP
     port: 3000
     targetPort: 3000

@@ -14,3 +14,19 @@ build:
         manual:
           - src: 'apps/auth/scr/**/*.ts'
             dest: .
+    - image: nestjs/tickets
+      context: .
+      docker:
+        dockerfile: Dockerfile.tickets
+      sync:
+        manual:
+          - src: 'apps/tickets/scr/**/*.ts'
+            dest: .
+    - image: nestjs/orders
+      context: .
+      docker:
+        dockerfile: Dockerfile.orders
+      sync:
+        manual:
+          - src: 'apps/orders/scr/**/*.ts'
+            dest: .

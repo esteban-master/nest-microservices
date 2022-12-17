@@ -7,6 +7,11 @@ import { DatabaseModule } from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Ticket, TicketSchema } from './models/tickets';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import {
+  NatsJetStreamTransport,
+  NatsJetStreamClient,
+} from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -19,18 +24,26 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     }),
     DatabaseModule,
     MongooseModule.forFeature([{ name: Ticket.name, schema: TicketSchema }]),
+    NatsJetStreamTransport.register({
+      connectionOptions: {
+        servers: ['http://nats-srv:4222'],
+        name: 'tickets-publisher',
+        connectedHook: (nc) =>
+          console.log('From hook: publisher connected to ', nc.getServer()),
+      },
+    }),
     ClientsModule.register([
       {
         name: 'TICKET_SERVICE',
         transport: Transport.NATS,
         options: {
           servers: ['http://nats-srv:4222'],
-          name: 'ticketing',
+          queue: 'auth-queue',
         },
       },
     ]),
   ],
   controllers: [TicketsController],
-  providers: [TicketsService],
+  providers: [TicketsService, NatsJetStreamClient],
 })
 export class TicketsModule {}

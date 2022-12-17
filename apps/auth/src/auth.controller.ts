@@ -1,5 +1,6 @@
 import { CurrentUser } from '@app/common';
 import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import { MessagePattern } from '@nestjs/microservices';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -29,5 +30,12 @@ export class AuthController {
   @Get('/current')
   async current(@CurrentUser() user: User) {
     return user;
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  @MessagePattern('validate_user')
+  async validateUser() {
+    console.log("LLEGO AQUIIIIIIIII!", {jaja: 'jojoj'})
+    return "JAJAJAJAJAJAJAJAAJJ POTIYPPPP";
   }
 }

@@ -1,4 +1,4 @@
-import { DatabaseModule } from '@app/common';
+import { AuthModule, DatabaseModule } from '@app/common';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { OrdersController } from './orders.controller';
@@ -7,8 +7,10 @@ import * as Joi from 'joi';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Ticket, TicketSchema } from './models/ticket';
 import { Order, Orderchema } from './models/order';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { NatsModule } from '@app/common/nats/nats.module';
+import {
+  NatsJetStreamClient,
+  NatsJetStreamTransport,
+} from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 
 @Module({
   imports: [
@@ -25,18 +27,14 @@ import { NatsModule } from '@app/common/nats/nats.module';
       { name: Order.name, schema: Orderchema },
       { name: Ticket.name, schema: TicketSchema },
     ]),
-    ClientsModule.register([
-      {
-        name: 'ORDER_SERVICE',
-        transport: Transport.NATS,
-        options: {
-          servers: ['http://nats-srv:4222'],
-          name: 'ticketing',
-        },
+    NatsJetStreamTransport.register({
+      connectionOptions: {
+        servers: 'http://nats-srv:4222',
+        name: 'tickets-publisher',
       },
-    ]),
+    }),
   ],
   controllers: [OrdersController],
-  providers: [OrdersService],
+  providers: [OrdersService, NatsJetStreamClient, AuthModule],
 })
 export class OrdersModule {}

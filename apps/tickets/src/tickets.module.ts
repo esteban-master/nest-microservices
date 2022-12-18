@@ -34,11 +34,10 @@ import {
     }),
     ClientsModule.register([
       {
-        name: 'TICKET_SERVICE',
+        name: 'AUTH',
         transport: Transport.NATS,
         options: {
           servers: ['http://nats-srv:4222'],
-          queue: 'auth-queue',
         },
       },
     ]),

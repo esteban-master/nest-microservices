@@ -1,4 +1,4 @@
-import { AuthModule, DatabaseModule } from '@app/common';
+import { DatabaseModule } from '@app/common';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { OrdersController } from './orders.controller';
@@ -35,6 +35,6 @@ import {
     }),
   ],
   controllers: [OrdersController],
-  providers: [OrdersService, NatsJetStreamClient, AuthModule],
+  providers: [OrdersService, NatsJetStreamClient],
 })
 export class OrdersModule {}

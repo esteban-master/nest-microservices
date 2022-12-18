@@ -1,6 +1,6 @@
 // import { JwtAuthGuard } from '@app/common';
 import { NatsJetStreamContext } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { Ctx, EventPattern, Payload } from '@nestjs/microservices';
 import { OrdersService } from './orders.service';
 
@@ -14,12 +14,11 @@ export class OrdersController {
   }
 
   @EventPattern('ticket.created')
-  // @UseGuards(JwtAuthGuard)
   public async orderUpdatedHandler(
     @Payload() data: string,
     @Ctx() context: NatsJetStreamContext,
   ) {
     context.message.ack();
-    console.log('received: ' + context.message.subject, data);
+    console.log('Recibido desde ORDER: ' + context.message.subject, data);
   }
 }

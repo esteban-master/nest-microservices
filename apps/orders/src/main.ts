@@ -18,11 +18,6 @@ async function bootstrap() {
         name: 'orders-listener',
         connectedHook: async (nc) => {
           logger.log('Connected to ' + nc.getServer());
-          for await (const s of nc.status()) {
-            if (s.type == DebugEvents.PingTimer) {
-              console.log('We got ping timer attempt: ' + s.data);
-            }
-          }
         },
       },
       consumerOptions: {

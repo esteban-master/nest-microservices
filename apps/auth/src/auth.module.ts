@@ -11,12 +11,7 @@ import { hashSync } from 'bcrypt';
 import { JwtModule } from '@nestjs/jwt';
 import { JWTStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.strategy';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-// import { ClientsModule, Transport } from '@nestjs/microservices';
-// import { NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-// import { NatsJetStreamClient, NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-// import { ClientsModule, Transport } from '@nestjs/microservices';
-// import { NatsJetStreamClient, NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -55,22 +50,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       }),
       inject: [ConfigService],
     }),
-    // NatsJetStreamTransport.register({
-    //   connectionOptions: {
-    //     servers: ['http://nats-srv:4222'],
-    //     name: 'auth-service',
-    //   },
-    // }),
-    ClientsModule.register([
-      {
-        name: 'AUTH_SERVICE',
-        transport: Transport.NATS,
-        options: {
-          servers: ['http://nats-srv:4222'],
-          queue: 'auth-queue',
-        },
-      },
-    ]),
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JWTStrategy],

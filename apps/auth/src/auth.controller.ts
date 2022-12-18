@@ -32,10 +32,9 @@ export class AuthController {
     return user;
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @MessagePattern('validate_user')
-  async validateUser() {
-    console.log("LLEGO AQUIIIIIIIII!", {jaja: 'jojoj'})
-    return "JAJAJAJAJAJAJAJAAJJ POTIYPPPP";
+  async validateUser(@CurrentUser() user: User) {
+    return user;
   }
 }

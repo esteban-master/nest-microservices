@@ -1,43 +1,38 @@
-// import { NatsJetStreamClient } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-// import { NatsJetStreamClient } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-import { NatsJetStreamClient } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import {
   CanActivate,
   ExecutionContext,
-  // Inject,
-  // Inject,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-// import { ClientProxy } from '@nestjs/microservices';
-// import { ClientProxy } from '@nestjs/microservices';
-import { catchError, Observable, tap } from 'rxjs';
-// import { AUTH } from './auth.service';
+
+import { ClientProxy } from '@nestjs/microservices';
+import { lastValueFrom, Observable } from 'rxjs';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(private client: NatsJetStreamClient) {}
-  // constructor(@Inject(AUTH) private client: ClientProxy) {}
+  constructor(@Inject('AUTH') private client: ClientProxy) {
+    console.log('CONTRUSTI');
+  }
 
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const authentication = this.getAuthentication(context);
-    console.log('MMMMMMMMMM: ', authentication);
-    this.client
-      .send('validate_user', {
-        Authentication: authentication,
+    return lastValueFrom(
+      this.client.send('validate_user', {
+        cookies: {
+          Authentication: authentication,
+        },
+      }),
+    )
+      .then((res) => {
+        this.addUser(res, context);
+        return true;
       })
-      .pipe(
-        tap((res) => {
-          console.log('RESSSSSSSSSSSSSSSSSSSSSS: ', res);
-          this.addUser(res, context);
-        }),
-        catchError(() => {
-          throw new UnauthorizedException();
-        }),
-      );
-    return true;
+      .catch(() => {
+        throw new UnauthorizedException();
+      });
   }
 
   private getAuthentication(context: ExecutionContext) {

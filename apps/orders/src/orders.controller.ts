@@ -1,24 +1,39 @@
-// import { JwtAuthGuard } from '@app/common';
 import { NatsJetStreamContext } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { Ctx, EventPattern, Payload } from '@nestjs/microservices';
 import { OrdersService } from './orders.service';
+import { JwtAuthGuard, TicketEvent } from '@app/common';
+import { TicketsService } from './tickets.service';
+import { TicketDto } from './dto/ticketDto';
 
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly ordersService: OrdersService,
+    private readonly ticketsService: TicketsService,
+  ) {}
 
   @Get()
   getOrders() {
     return this.ordersService.getAll();
   }
 
-  @EventPattern('ticket.created')
+  @Get('/tickets')
+  getTickets() {
+    return this.ticketsService.getAll();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  createOrder() {
+    return 'Creando...';
+  }
+
+  @EventPattern(TicketEvent.Created)
   public async orderUpdatedHandler(
-    @Payload() data: string,
+    @Payload() data: TicketDto,
     @Ctx() context: NatsJetStreamContext,
   ) {
-    context.message.ack();
-    console.log('Recibido desde ORDER: ' + context.message.subject, data);
+    this.ticketsService.createTicket(data, context);
   }
 }

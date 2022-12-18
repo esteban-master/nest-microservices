@@ -11,6 +11,8 @@ import {
   NatsJetStreamClient,
   NatsJetStreamTransport,
 } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { TicketsService } from './tickets.service';
 
 @Module({
   imports: [
@@ -33,8 +35,17 @@ import {
         name: 'tickets-publisher',
       },
     }),
+    ClientsModule.register([
+      {
+        name: 'AUTH',
+        transport: Transport.NATS,
+        options: {
+          servers: ['http://nats-srv:4222'],
+        },
+      },
+    ]),
   ],
   controllers: [OrdersController],
-  providers: [OrdersService, NatsJetStreamClient],
+  providers: [OrdersService, TicketsService, NatsJetStreamClient],
 })
 export class OrdersModule {}

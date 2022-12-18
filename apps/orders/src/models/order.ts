@@ -1,4 +1,4 @@
-import { OrderStatus } from '@app/common/types/OrderStatus';
+import { OrderStatus } from '@app/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, HydratedDocument, Types } from 'mongoose';
 

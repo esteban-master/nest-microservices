@@ -1,10 +1,4 @@
-// import { CurrentUser } from '@app/common';
-// import { CurrentUser, JwtAuthGuard } from '@app/common';
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-// import { User } from 'apps/auth/src/models/user';
-// import { Ctx, EventPattern, NatsContext, Payload } from '@nestjs/microservices';
-// import { JwtAuthGuard } from 'apps/auth/src/guards/jwtAuth.guard';
-// import { User } from 'apps/auth/src/models/user';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { CreateTicketDto } from './dto/createTicketDto';
 import { TicketsService } from './tickets.service';
 import { JwtAuthGuard } from '@app/common';
@@ -18,10 +12,9 @@ export class TicketsController {
   createTicket(@Body() createTicketDto: CreateTicketDto) {
     return this.ticketsService.create(createTicketDto);
   }
-  @Post('/dos')
-  createTicket2() {
-    // console.log("JAJAJAJAJAAJ POTPPPP", user)
-    // return true
-    // return this.ticketsService.create2();
+
+  @Get()
+  getTickets() {
+    return this.ticketsService.getAll();
   }
 }

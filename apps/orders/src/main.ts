@@ -3,11 +3,12 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { CustomStrategy } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { DebugEvents } from 'nats';
 import { OrdersModule } from './orders.module';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(OrdersModule);
+  app.use(cookieParser());
   app.set('trust proxy', true);
   app.useGlobalPipes(new ValidationPipe());
   const logger = new Logger();

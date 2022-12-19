@@ -26,4 +26,8 @@ export class TicketsService {
       throw new InternalServerErrorException();
     }
   }
+
+  async findById(id: string) {
+    return await this.ticketModel.findById(id);
+  }
 }

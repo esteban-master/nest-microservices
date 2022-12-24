@@ -5,6 +5,7 @@ import { TicketEvent } from '@app/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Ticket, TicketDocument } from './models/tickets';
 import { Model } from 'mongoose';
+import { EditTicketDto } from './dto/editTicketDto';
 
 @Injectable()
 export class TicketsService {
@@ -25,6 +26,21 @@ export class TicketsService {
 
       this.client.emit(TicketEvent.Created, newTicket);
       return newTicket;
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async edit(ticketId: string, editeTicketDto: EditTicketDto) {
+    try {
+      const ticket = await this.ticketModel.findOneAndUpdate(
+        { _id: ticketId },
+        editeTicketDto,
+        { new: true },
+      );
+
+      this.client.emit(TicketEvent.Updated, ticket);
+      return ticket;
     } catch (error) {
       throw new InternalServerErrorException();
     }

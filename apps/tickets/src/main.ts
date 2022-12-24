@@ -18,7 +18,7 @@ async function bootstrap() {
         servers: ['http://nats-srv:4222'],
         name: 'tickets-listener',
         connectedHook: async (nc) => {
-          logger.log('Ticket: Connected to ' + nc.getServer());
+          logger.log('Tickets service connected to ' + nc.getServer());
         },
       },
       consumerOptions: {

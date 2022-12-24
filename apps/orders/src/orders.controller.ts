@@ -13,6 +13,7 @@ import { OrdersService } from './orders.service';
 import {
   CreateTicketPayloadEvent,
   CurrentUser,
+  EditTicketPayloadEvent,
   JwtAuthGuard,
   TicketEvent,
   User,
@@ -37,6 +38,7 @@ export class OrdersController {
   getTickets() {
     return this.ticketsService.getAll();
   }
+
   @UseGuards(JwtAuthGuard)
   @Get('/:id')
   getOrderById(@Param('id') orderId: string, @CurrentUser() user: User) {
@@ -64,5 +66,13 @@ export class OrdersController {
     @Ctx() context: NatsJetStreamContext,
   ) {
     this.ticketsService.createTicket(data, context);
+  }
+
+  @EventPattern(TicketEvent.Updated)
+  public async updatedCreatedEvent(
+    @Payload() data: EditTicketPayloadEvent,
+    @Ctx() context: NatsJetStreamContext,
+  ) {
+    this.ticketsService.updateTicket(data, context);
   }
 }

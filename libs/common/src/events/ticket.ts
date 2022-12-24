@@ -1,5 +1,6 @@
 export const TicketEvent = {
   Created: 'ticket.created',
+  Updated: 'ticket.updated',
 };
 
 export type CreateTicketPayloadEvent = {
@@ -7,3 +8,5 @@ export type CreateTicketPayloadEvent = {
   title: string;
   price: number;
 };
+
+export type EditTicketPayloadEvent = CreateTicketPayloadEvent;

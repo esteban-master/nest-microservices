@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TicketDocument } from 'apps/tickets/src/models/tickets';
 import { Ticket } from './models/ticket';
-import { CreateTicketPayloadEvent } from '@app/common';
+import { CreateTicketPayloadEvent, EditTicketPayloadEvent } from '@app/common';
 
 @Injectable()
 export class TicketsService {
@@ -24,6 +24,24 @@ export class TicketsService {
     try {
       const newTicket = new this.ticketModel({ ...ticket, _id: ticket.id });
       await newTicket.save();
+      context.message.ack();
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async updateTicket(
+    ticket: EditTicketPayloadEvent,
+    context: NatsJetStreamContext,
+  ) {
+    try {
+      await this.ticketModel.updateOne(
+        { _id: ticket.id },
+        {
+          title: ticket.title,
+          price: ticket.price,
+        },
+      );
       context.message.ack();
     } catch (error) {
       throw new InternalServerErrorException();

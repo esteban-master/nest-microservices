@@ -12,7 +12,11 @@ import { CreateOrderDto } from './dto/createOrderDto';
 import { TicketsService } from './tickets.service';
 import { OrderStatus, User } from '@app/common';
 import { NatsJetStreamClient } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-import { CreateOrderPayloadEvent, OrderEvent } from '@app/common/events/order';
+import {
+  CancelledOrderPayloadEvent,
+  CreateOrderPayloadEvent,
+  OrderEvent,
+} from '@app/common/events/order';
 
 @Injectable()
 export class OrdersService {
@@ -91,9 +95,17 @@ export class OrdersService {
   }
 
   async cancelOrder(orderId: string, userId: string): Promise<Order> {
-    const order = await this.getOrder(orderId, userId);
-    order.status = OrderStatus.Cancelled;
-    await order.save();
-    return order;
+    try {
+      const order = await this.getOrder(orderId, userId);
+      order.status = OrderStatus.Cancelled;
+      await order.save();
+      this.natsClient.emit<CancelledOrderPayloadEvent>(OrderEvent.Cancelled, {
+        id: order.id,
+        ticket: { id: order.ticket.toString() },
+      });
+      return order;
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 }

@@ -1,5 +1,6 @@
 export const OrderEvent = {
   Created: 'order.created',
+  Cancelled: 'order.cancelled',
 };
 
 export type CreateOrderPayloadEvent = {
@@ -10,5 +11,12 @@ export type CreateOrderPayloadEvent = {
   ticket: {
     id: string;
     price: number;
+  };
+};
+
+export type CancelledOrderPayloadEvent = {
+  id: string;
+  ticket: {
+    id: string;
   };
 };

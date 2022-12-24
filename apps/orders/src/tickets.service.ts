@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { NatsJetStreamContext } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -31,17 +35,22 @@ export class TicketsService {
   }
 
   async updateTicket(
-    ticket: EditTicketPayloadEvent,
+    editTicket: EditTicketPayloadEvent,
     context: NatsJetStreamContext,
   ) {
     try {
-      await this.ticketModel.updateOne(
-        { _id: ticket.id },
-        {
-          title: ticket.title,
-          price: ticket.price,
-        },
-      );
+      const ticket = await this.ticketModel.findOne({
+        _id: editTicket.id,
+        version: editTicket.version - 1,
+      });
+
+      if (!ticket) {
+        throw new NotFoundException('Ticket not found');
+      }
+      const { title, price, version } = editTicket;
+      ticket.set({ title, price, version });
+      await ticket.save();
+
       context.message.ack();
     } catch (error) {
       throw new InternalServerErrorException();

@@ -43,8 +43,7 @@ export class TicketsController {
     @Payload() data: CreateOrderPayloadEvent,
     @Ctx() context: NatsJetStreamContext,
   ) {
-    console.log('Order recibida', data);
-    context.message.ack();
+    this.ticketsService.orderCreatedEvent(data, context);
   }
 
   @EventPattern(OrderEvent.Cancelled)

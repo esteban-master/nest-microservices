@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, HydratedDocument, Types } from 'mongoose';
 
-export type TicketDocument = HydratedDocument<Ticket>;
+export type TicketDocument = HydratedDocument<Ticket> & { version: number };
 
 @Schema({
   toJSON: {
@@ -20,6 +20,12 @@ export class Ticket extends Document {
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
   userId: Types.ObjectId;
+
+  @Prop()
+  orderId?: string;
 }
 
-export const TicketSchema = SchemaFactory.createForClass(Ticket);
+const TicketSchema = SchemaFactory.createForClass(Ticket);
+TicketSchema.set('versionKey', 'version');
+
+export { TicketSchema };

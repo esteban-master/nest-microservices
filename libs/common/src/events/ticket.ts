@@ -7,6 +7,7 @@ export type CreateTicketPayloadEvent = {
   id: string;
   title: string;
   price: number;
+  version: number;
 };
 
 export type EditTicketPayloadEvent = CreateTicketPayloadEvent;

@@ -11,9 +11,7 @@ import { lastValueFrom, Observable } from 'rxjs';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(@Inject('AUTH') private client: ClientProxy) {
-    console.log('CONTRUSTI');
-  }
+  constructor(@Inject('AUTH') private client: ClientProxy) {}
 
   canActivate(
     context: ExecutionContext,

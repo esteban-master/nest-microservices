@@ -1,10 +1,23 @@
 import { NatsJetStreamContext } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { Ctx, EventPattern, Payload } from '@nestjs/microservices';
 import { OrdersService } from './orders.service';
-import { CurrentUser, JwtAuthGuard, TicketEvent, User } from '@app/common';
+import {
+  CreateTicketPayloadEvent,
+  CurrentUser,
+  JwtAuthGuard,
+  TicketEvent,
+  User,
+} from '@app/common';
 import { TicketsService } from './tickets.service';
-import { TicketDto } from './dto/ticketDto';
 import { CreateOrderDto } from './dto/createOrderDto';
 
 @Controller('orders')
@@ -20,6 +33,10 @@ export class OrdersController {
     return this.ordersService.getAll(user.id);
   }
 
+  @Get('/tickets')
+  getTickets() {
+    return this.ticketsService.getAll();
+  }
   @UseGuards(JwtAuthGuard)
   @Get('/:id')
   getOrderById(@Param('id') orderId: string, @CurrentUser() user: User) {
@@ -32,11 +49,6 @@ export class OrdersController {
     return this.ordersService.cancelOrder(orderId, user.id);
   }
 
-  @Get('/tickets')
-  getTickets() {
-    return this.ticketsService.getAll();
-  }
-
   @UseGuards(JwtAuthGuard)
   @Post()
   createOrder(
@@ -47,8 +59,8 @@ export class OrdersController {
   }
 
   @EventPattern(TicketEvent.Created)
-  public async orderUpdatedHandler(
-    @Payload() data: TicketDto,
+  public async ticketCreatedEvent(
+    @Payload() data: CreateTicketPayloadEvent,
     @Ctx() context: NatsJetStreamContext,
   ) {
     this.ticketsService.createTicket(data, context);

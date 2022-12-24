@@ -29,7 +29,7 @@ async function bootstrap() {
         deliverPolicy: 'All',
       },
       streamConfig: {
-        name: 'tickets_stream',
+        name: 'orders_stream',
         subjects: ['ticket.*'],
       },
     }),

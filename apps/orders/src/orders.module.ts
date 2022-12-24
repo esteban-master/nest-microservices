@@ -32,7 +32,7 @@ import { TicketsService } from './tickets.service';
     NatsJetStreamTransport.register({
       connectionOptions: {
         servers: 'http://nats-srv:4222',
-        name: 'tickets-publisher',
+        name: 'orders-publisher',
       },
     }),
     ClientsModule.register([

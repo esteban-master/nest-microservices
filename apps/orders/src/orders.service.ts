@@ -11,12 +11,15 @@ import { Order, OrderDocument } from './models/order';
 import { CreateOrderDto } from './dto/createOrderDto';
 import { TicketsService } from './tickets.service';
 import { OrderStatus, User } from '@app/common';
+import { NatsJetStreamClient } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+import { CreateOrderPayloadEvent, OrderEvent } from '@app/common/events/order';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     private readonly ticketService: TicketsService,
+    private natsClient: NatsJetStreamClient,
   ) {}
 
   async getAll(userId: string): Promise<Order[]> {
@@ -70,6 +73,17 @@ export class OrdersService {
       });
 
       await newOrder.save();
+
+      this.natsClient.emit<CreateOrderPayloadEvent>(OrderEvent.Created, {
+        id: newOrder.id,
+        status: newOrder.status,
+        expiresAt: newOrder.expiresAt.toISOString(),
+        userId: newOrder.userId.toString(),
+        ticket: {
+          id: ticket.id,
+          price: ticket.price,
+        },
+      });
       return newOrder;
     } catch (error) {
       throw new InternalServerErrorException();

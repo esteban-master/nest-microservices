@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { TicketDocument } from 'apps/tickets/src/models/tickets';
 import { Ticket } from './models/ticket';
-import { TicketDto } from './dto/ticketDto';
+import { CreateTicketPayloadEvent } from '@app/common';
 
 @Injectable()
 export class TicketsService {
@@ -17,7 +17,10 @@ export class TicketsService {
     return await this.ticketModel.find({});
   }
 
-  async createTicket(ticket: TicketDto, context: NatsJetStreamContext) {
+  async createTicket(
+    ticket: CreateTicketPayloadEvent,
+    context: NatsJetStreamContext,
+  ) {
     try {
       const newTicket = new this.ticketModel({ ...ticket, _id: ticket.id });
       await newTicket.save();

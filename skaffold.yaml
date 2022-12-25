@@ -9,7 +9,7 @@ build:
     - image: nestjs/auth
       context: .
       docker:
-        dockerfile: Dockerfile.auth
+        dockerfile: docker/Dockerfile.auth
       sync:
         manual:
           - src: 'apps/auth/scr/**/*.ts'
@@ -17,7 +17,7 @@ build:
     - image: nestjs/tickets
       context: .
       docker:
-        dockerfile: Dockerfile.tickets
+        dockerfile: docker/Dockerfile.tickets
       sync:
         manual:
           - src: 'apps/tickets/scr/**/*.ts'
@@ -25,7 +25,7 @@ build:
     - image: nestjs/orders
       context: .
       docker:
-        dockerfile: Dockerfile.orders
+        dockerfile: docker/Dockerfile.orders
       sync:
         manual:
           - src: 'apps/orders/scr/**/*.ts'

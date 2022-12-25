@@ -2,14 +2,22 @@ import {
   NatsJetStreamClient,
   NatsJetStreamContext,
 } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateTicketDto } from './dto/createTicketDto';
 import { TicketEvent } from '@app/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Ticket, TicketDocument } from './models/tickets';
 import { Model } from 'mongoose';
 import { EditTicketDto } from './dto/editTicketDto';
-import { CreateOrderPayloadEvent } from '@app/common/events/order';
+import {
+  CancelledOrderPayloadEvent,
+  CreateOrderPayloadEvent,
+} from '@app/common/events/order';
 
 @Injectable()
 export class TicketsService {
@@ -36,10 +44,14 @@ export class TicketsService {
   }
 
   async edit(ticketId: string, editTicketDto: EditTicketDto) {
+    const ticket = await this.findTicketById(ticketId);
+
+    if (ticket.orderId) {
+      throw new BadRequestException('Cannot edit a reserved ticket');
+    }
+
     try {
-      const ticket = await this.ticketModel.findById(ticketId);
       ticket.set(editTicketDto);
-      ticket.version += 1;
       await ticket.save();
 
       this.client.emit(TicketEvent.Updated, ticket);
@@ -50,20 +62,40 @@ export class TicketsService {
   }
 
   async orderCreatedEvent(
-    orderCreatedEvent: CreateOrderPayloadEvent,
+    data: CreateOrderPayloadEvent,
     context: NatsJetStreamContext,
   ) {
+    const ticket = await this.findTicketById(data.ticket.id);
     try {
-      const ticket = await this.ticketModel.findById(
-        orderCreatedEvent.ticket.id,
-      );
-
-      if (!ticket) {
-        throw new NotFoundException('Ticket not found');
-      }
-      ticket.orderId = orderCreatedEvent.id;
+      ticket.orderId = data.id;
       await ticket.save();
       context.message.ack();
-    } catch (error) {}
+      this.client.emit(TicketEvent.Updated, ticket);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+  async orderCancelledEvent(
+    data: CancelledOrderPayloadEvent,
+    context: NatsJetStreamContext,
+  ) {
+    const ticket = await this.findTicketById(data.ticket.id);
+    try {
+      ticket.orderId = undefined;
+      await ticket.save();
+      context.message.ack();
+      this.client.emit(TicketEvent.Updated, ticket);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  private async findTicketById(id: string): Promise<Ticket> {
+    const ticket = await this.ticketModel.findById(id);
+
+    if (!ticket) {
+      throw new NotFoundException('Ticket not found');
+    }
+    return ticket;
   }
 }

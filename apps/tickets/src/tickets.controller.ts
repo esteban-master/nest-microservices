@@ -51,8 +51,7 @@ export class TicketsController {
     @Payload() data: CancelledOrderPayloadEvent,
     @Ctx() context: NatsJetStreamContext,
   ) {
-    console.log('Order cancelada recibida', data);
-    context.message.ack();
+    this.ticketsService.orderCancelledEvent(data, context);
   }
 
   @Get()

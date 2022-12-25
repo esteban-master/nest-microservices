@@ -10,4 +10,6 @@ export type CreateTicketPayloadEvent = {
   version: number;
 };
 
-export type EditTicketPayloadEvent = CreateTicketPayloadEvent;
+export type EditTicketPayloadEvent = CreateTicketPayloadEvent & {
+  orderId?: string;
+};

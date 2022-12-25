@@ -10,6 +10,7 @@ export type TicketsDocument = HydratedDocument<Ticket> & { version: number };
       delete ret._id;
     },
   },
+  versionKey: 'version',
 })
 export class Ticket extends Document {
   @Prop({ required: true, trim: true })
@@ -19,6 +20,4 @@ export class Ticket extends Document {
   price: number;
 }
 
-const TicketSchema = SchemaFactory.createForClass(Ticket);
-TicketSchema.set('versionKey', 'version');
-export { TicketSchema };
+export const TicketSchema = SchemaFactory.createForClass(Ticket);

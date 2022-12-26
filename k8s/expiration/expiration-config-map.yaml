@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: expiration-config-map
+data: 
+  NATS_URL: http://nats-srv:4222
+  REDIS_HOST: expiration-redis-srv

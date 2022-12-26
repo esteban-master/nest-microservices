@@ -1,6 +1,6 @@
 import { DatabaseModule } from '@app/common';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import * as Joi from 'joi';
@@ -22,6 +22,7 @@ import { TicketsService } from './tickets.service';
       validationSchema: Joi.object({
         MONGO_URI: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
+        NATS_URL: Joi.string().required(),
       }),
     }),
     DatabaseModule,
@@ -35,13 +36,16 @@ import { TicketsService } from './tickets.service';
         name: 'orders-publisher',
       },
     }),
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: 'AUTH',
-        transport: Transport.NATS,
-        options: {
-          servers: ['http://nats-srv:4222'],
-        },
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.NATS,
+          options: {
+            servers: [configService.get('NATS_URL')],
+          },
+        }),
+        inject: [ConfigService],
       },
     ]),
   ],

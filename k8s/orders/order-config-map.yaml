@@ -4,3 +4,4 @@ metadata:
   name: orders-config-map
 data: 
   MONGO_URI: mongodb://orders-mongo-srv:27017/orders
+  NATS_URL: http://nats-srv:4222

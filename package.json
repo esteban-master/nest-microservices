@@ -13,6 +13,8 @@
     "start:tickets": "nest start tickets --watch",
     "build:orders": "nest build orders",
     "start:orders": "nest start orders --watch",
+    "build:expiration": "nest build expiration",
+    "start:expiration": "nest start expiration --watch",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

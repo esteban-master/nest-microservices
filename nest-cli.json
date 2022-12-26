@@ -44,6 +44,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/orders/tsconfig.app.json"
       }
+    },
+    "expiration": {
+      "type": "application",
+      "root": "apps/expiration",
+      "entryFile": "main",
+      "sourceRoot": "apps/expiration/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/expiration/tsconfig.app.json"
+      }
     }
   }
 }

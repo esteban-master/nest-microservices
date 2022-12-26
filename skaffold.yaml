@@ -30,3 +30,11 @@ build:
         manual:
           - src: 'apps/orders/scr/**/*.ts'
             dest: .
+    - image: nestjs/expiration
+      context: .
+      docker:
+        dockerfile: docker/Dockerfile.expiration
+      sync:
+        manual:
+          - src: 'apps/expiration/scr/**/*.ts'
+            dest: .

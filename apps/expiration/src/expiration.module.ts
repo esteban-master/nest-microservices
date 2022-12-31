@@ -5,7 +5,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { BullModule } from '@nestjs/bull';
 import { ExpirationConsumer } from './expiration.processor';
-import { NatsJetStreamClient, NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+import {
+  NatsJetStreamClient,
+  NatsJetStreamTransport,
+} from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+import { Queues } from '@app/common';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -33,7 +38,7 @@ import { NatsJetStreamClient, NatsJetStreamTransport } from '@nestjs-plugins/nes
       inject: [ConfigService],
     }),
     BullModule.registerQueue({
-      name: 'order.expiration',
+      name: Queues.OrderExpiration,
     }),
   ],
   controllers: [ExpirationController],

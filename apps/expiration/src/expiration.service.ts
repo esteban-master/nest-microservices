@@ -1,3 +1,4 @@
+import { Queues } from '@app/common';
 import { CreateOrderPayloadEvent, OrderEvent } from '@app/common/events';
 import { NatsJetStreamContext } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import { InjectQueue } from '@nestjs/bull';
@@ -7,7 +8,7 @@ import { Queue } from 'bull';
 @Injectable()
 export class ExpirationService {
   constructor(
-    @InjectQueue('order.expiration') private orderExpirationQueue: Queue,
+    @InjectQueue(Queues.OrderExpiration) private orderExpirationQueue: Queue,
   ) {}
 
   async handleExpiration(

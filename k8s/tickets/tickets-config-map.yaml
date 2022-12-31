@@ -4,3 +4,4 @@ metadata:
   name: tickets-config-map
 data: 
   MONGO_URI: mongodb://tickets-mongo-srv:27017/tickets
+  NATS_URL: http://nats-srv:4222

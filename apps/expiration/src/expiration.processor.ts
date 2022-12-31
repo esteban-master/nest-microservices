@@ -1,11 +1,11 @@
-import { ExpirationEvent } from '@app/common';
+import { ExpirationEvent, Queues } from '@app/common';
 import { OrderEvent } from '@app/common/events/order';
 import { NatsJetStreamClient } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import { Process, Processor } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
 
-@Processor('order.expiration')
+@Processor(Queues.OrderExpiration)
 export class ExpirationConsumer {
   private readonly logger = new Logger(ExpirationConsumer.name);
 

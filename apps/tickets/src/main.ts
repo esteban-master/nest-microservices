@@ -5,17 +5,18 @@ import { TicketsModule } from './tickets.module';
 import * as cookieParser from 'cookie-parser';
 import { CustomStrategy } from '@nestjs/microservices';
 import { NatsJetStreamServer } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(TicketsModule);
   app.use(cookieParser());
   app.set('trust proxy', true);
   app.useGlobalPipes(new ValidationPipe());
-
+  const configService = app.get(ConfigService);
   const logger = new Logger();
   const options: CustomStrategy = {
     strategy: new NatsJetStreamServer({
       connectionOptions: {
-        servers: ['http://nats-srv:4222'],
+        servers: [configService.get('NATS_URL')],
         name: 'tickets-listener',
         connectedHook: async (nc) => {
           logger.log('Tickets service connected to ' + nc.getServer());

@@ -9,9 +9,10 @@ export type OrderDocument = HydratedDocument<Order>;
     transform(doc, ret) {
       ret.id = ret._id;
       delete ret._id;
-      delete ret.__v;
     },
   },
+  optimisticConcurrency: true,
+  versionKey: 'version',
 })
 export class Order extends Document {
   @Prop({

@@ -13,7 +13,6 @@ export class ExpirationController {
     @Payload() data: CreateOrderPayloadEvent,
     @Ctx() context: NatsJetStreamContext,
   ) {
-    console.log("EVENTO EN EXPIRATION", OrderEvent.Created)
-    context.message.ack();
+    this.expirationService.handleExpiration(data, context);
   }
 }

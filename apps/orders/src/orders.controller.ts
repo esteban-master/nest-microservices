@@ -14,6 +14,8 @@ import {
   CreateTicketPayloadEvent,
   CurrentUser,
   EditTicketPayloadEvent,
+  ExpirationEvent,
+  ExpirationPayloadEvent,
   JwtAuthGuard,
   TicketEvent,
   User,
@@ -41,8 +43,10 @@ export class OrdersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/:id')
-  getOrderById(@Param('id') orderId: string, @CurrentUser() user: User) {
-    return this.ordersService.getOrder(orderId, user.id);
+  async getOrderById(@Param('id') orderId: string, @CurrentUser() user: User) {
+    const order = await this.ordersService.getOrder(orderId);
+    this.ordersService.isTheSameUser(order, user.id);
+    return order;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -74,5 +78,13 @@ export class OrdersController {
     @Ctx() context: NatsJetStreamContext,
   ) {
     this.ticketsService.updateTicket(data, context);
+  }
+
+  @EventPattern(ExpirationEvent.Expiration)
+  public async expirationOrderEvent(
+    @Payload() data: ExpirationPayloadEvent,
+    @Ctx() context: NatsJetStreamContext,
+  ) {
+    this.ordersService.expirationOrder(data, context);
   }
 }

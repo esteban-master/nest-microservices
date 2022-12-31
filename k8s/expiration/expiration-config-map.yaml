@@ -5,3 +5,4 @@ metadata:
 data: 
   NATS_URL: http://nats-srv:4222
   REDIS_HOST: expiration-redis-srv
+  REDIS_PORT: '6379'

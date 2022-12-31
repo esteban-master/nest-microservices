@@ -10,8 +10,11 @@ import { Model } from 'mongoose';
 import { Order, OrderDocument } from './models/order';
 import { CreateOrderDto } from './dto/createOrderDto';
 import { TicketsService } from './tickets.service';
-import { OrderStatus, User } from '@app/common';
-import { NatsJetStreamClient } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+import { ExpirationPayloadEvent, OrderStatus, User } from '@app/common';
+import {
+  NatsJetStreamClient,
+  NatsJetStreamContext,
+} from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import {
   CancelledOrderPayloadEvent,
   CreateOrderPayloadEvent,
@@ -30,19 +33,6 @@ export class OrdersService {
     return await this.orderModel.find({
       userId,
     });
-  }
-
-  async getOrder(orderId: string, userId: string): Promise<Order> {
-    const order = await this.orderModel.findById(orderId);
-
-    if (!order) {
-      throw new NotFoundException();
-    }
-
-    if (order.userId.toString() !== userId.toString()) {
-      throw new UnauthorizedException();
-    }
-    return order;
   }
 
   async create({ ticketId }: CreateOrderDto, user: User) {
@@ -68,7 +58,7 @@ export class OrdersService {
 
     try {
       const expiresAt = new Date();
-      expiresAt.setSeconds(expiresAt.getSeconds() + 15 * 60);
+      expiresAt.setSeconds(expiresAt.getSeconds() + 1 * 60);
       const newOrder = new this.orderModel({
         userId: user.id,
         ticket,
@@ -96,16 +86,51 @@ export class OrdersService {
 
   async cancelOrder(orderId: string, userId: string): Promise<Order> {
     try {
-      const order = await this.getOrder(orderId, userId);
-      order.status = OrderStatus.Cancelled;
-      await order.save();
-      this.natsClient.emit<CancelledOrderPayloadEvent>(OrderEvent.Cancelled, {
-        id: order.id,
-        ticket: { id: order.ticket.toString() },
-      });
-      return order;
+      const order = await this.getOrder(orderId);
+      if (this.isTheSameUser(order, userId)) {
+        order.status = OrderStatus.Cancelled;
+        await order.save();
+        this.natsClient.emit<CancelledOrderPayloadEvent>(OrderEvent.Cancelled, {
+          id: order.id,
+          ticket: { id: order.ticket.toString() },
+        });
+        return order;
+      }
     } catch (error) {
       throw new InternalServerErrorException();
     }
+  }
+
+  async expirationOrder(
+    { orderId }: ExpirationPayloadEvent,
+    context: NatsJetStreamContext,
+  ) {
+    const order = await this.getOrder(orderId);
+    order.status = OrderStatus.Cancelled;
+    await order.save();
+
+    this.natsClient.emit<CancelledOrderPayloadEvent>(OrderEvent.Cancelled, {
+      id: order.id,
+      ticket: { id: order.ticket.toString() },
+    });
+
+    context.message.ack();
+  }
+
+  async getOrder(orderId: string) {
+    const order = await this.orderModel.findById(orderId);
+
+    if (!order) {
+      throw new NotFoundException();
+    }
+
+    return order;
+  }
+
+  async isTheSameUser(order: Order, userId: string) {
+    if (order.userId.toString() !== userId.toString()) {
+      throw new UnauthorizedException();
+    }
+    return true;
   }
 }

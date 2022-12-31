@@ -9,7 +9,7 @@ async function bootstrap() {
   const options: CustomStrategy = {
     strategy: new NatsJetStreamServer({
       connectionOptions: {
-        servers: ['http://nats-srv:4222'],
+        servers: [process.env.NATS_URL],
         name: 'expiration-listener',
         connectedHook: async (nc) => {
           logger.log('Expiration service connected to ' + nc.getServer());
@@ -21,10 +21,6 @@ async function bootstrap() {
         deliverTo: 'expiration-messages',
         manualAck: true,
         deliverPolicy: 'All',
-      },
-      streamConfig: {
-        name: 'expiration_stream',
-        subjects: ['order.*'],
       },
     }),
   };

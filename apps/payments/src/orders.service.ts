@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Order, OrderDocument } from './models/order';
 import { Model } from 'mongoose';
@@ -57,5 +61,15 @@ export class OrdersService {
     } catch (error) {
       throw new InternalServerErrorException();
     }
+  }
+
+  async getOrder(orderId: string) {
+    const order = await this.orderModel.findById(orderId);
+
+    if (!order) {
+      throw new NotFoundException();
+    }
+
+    return order;
   }
 }

@@ -8,6 +8,7 @@ export type CreateOrderPayloadEvent = {
   status: string;
   userId: string;
   expiresAt: string;
+  version: number;
   ticket: {
     id: string;
     price: number;
@@ -16,6 +17,7 @@ export type CreateOrderPayloadEvent = {
 
 export type CancelledOrderPayloadEvent = {
   id: string;
+  version: number;
   ticket: {
     id: string;
   };

@@ -20,6 +20,7 @@ import {
       validationSchema: Joi.object({
         MONGO_URI: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
+        NATS_URL: Joi.string().required(),
       }),
     }),
     DatabaseModule,
@@ -29,7 +30,7 @@ import {
         servers: ['http://nats-srv:4222'],
         name: 'tickets-publisher',
         connectedHook: (nc) =>
-          console.log('From hook: publisher connected to ', nc.getServer()),
+          console.log('Ticket service publisher connected to ', nc.getServer()),
       },
     }),
     ClientsModule.register([

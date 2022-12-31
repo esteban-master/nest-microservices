@@ -38,3 +38,11 @@ build:
         manual:
           - src: 'apps/expiration/scr/**/*.ts'
             dest: .
+    - image: nestjs/payments
+      context: .
+      docker:
+        dockerfile: docker/Dockerfile.payments
+      sync:
+        manual:
+          - src: 'apps/payments/scr/**/*.ts'
+            dest: .

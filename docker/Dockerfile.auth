@@ -11,4 +11,4 @@ COPY ./ .
 # RUN npm run build:auth
 
 # CMD ["node", "dist/apps/auth/main"]
-CMD ["npm", "run", "start:auth"]
+CMD ["npm", "run", "start", "auth"]

@@ -58,7 +58,7 @@ export class OrdersService {
 
     try {
       const expiresAt = new Date();
-      expiresAt.setSeconds(expiresAt.getSeconds() + 1 * 60);
+      expiresAt.setSeconds(expiresAt.getSeconds() + 0.5 * 60);
       const newOrder = new this.orderModel({
         userId: user.id,
         ticket,
@@ -73,6 +73,7 @@ export class OrdersService {
         status: newOrder.status,
         expiresAt: newOrder.expiresAt.toISOString(),
         userId: newOrder.userId.toString(),
+        version: newOrder.version,
         ticket: {
           id: ticket.id,
           price: ticket.price,
@@ -92,6 +93,7 @@ export class OrdersService {
         await order.save();
         this.natsClient.emit<CancelledOrderPayloadEvent>(OrderEvent.Cancelled, {
           id: order.id,
+          version: order.version,
           ticket: { id: order.ticket.toString() },
         });
         return order;
@@ -111,6 +113,7 @@ export class OrdersService {
 
     this.natsClient.emit<CancelledOrderPayloadEvent>(OrderEvent.Cancelled, {
       id: order.id,
+      version: order.version,
       ticket: { id: order.ticket.toString() },
     });
 
